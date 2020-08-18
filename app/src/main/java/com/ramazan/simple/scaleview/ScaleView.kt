@@ -8,6 +8,8 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import java.text.DecimalFormat
+import kotlin.math.abs
 
 class ScaleView@JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0):
     LinearLayout(context, attributeSet, defStyleAttr) {
@@ -15,12 +17,10 @@ class ScaleView@JvmOverloads constructor(context: Context, attributeSet: Attribu
     private val mp = ViewGroup.LayoutParams.MATCH_PARENT
     private val wc = ViewGroup.LayoutParams.WRAP_CONTENT
     private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
+    private val progressMaxValue = 20f
 
     private var motionTouchEventX = 0f
     private var currentX = 0f
-
-    val progressMaxValue = 20f
-    val progressMinValue = 0f
 
     private val segmentsCount = 11
     private val segments = ArrayList<FrameLayout>(segmentsCount)
@@ -99,8 +99,9 @@ class ScaleView@JvmOverloads constructor(context: Context, attributeSet: Attribu
         val currentProgress = cursor.x + (cursor.width / 2) - (segmentWidth / 2)
 
         if(totalProgress > 0){
-            val progress = (progressMaxValue * currentProgress / totalProgress).toInt()
-            cursorLabel.text = "$progress"
+            val progress = (progressMaxValue * currentProgress / totalProgress)
+            val value = DecimalFormat("##.#").format(progress)
+            cursorLabel.text = "$value"
         }
     }
 
@@ -255,7 +256,7 @@ class ScaleView@JvmOverloads constructor(context: Context, attributeSet: Attribu
 
     private fun onMove(event: MotionEvent) {
 
-        val dx = Math.abs(motionTouchEventX - currentX)
+        val dx = abs(motionTouchEventX - currentX)
 
         if(dx < touchTolerance)  return
 
